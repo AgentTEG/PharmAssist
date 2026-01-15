@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getDatabase, ref, set, update } from "firebase/database";
+import { getDatabase, ref, set } from "firebase/database";
 
 export const handleregister = defineStore('profile', {
   state: () => ({
@@ -28,22 +28,6 @@ export const handleregister = defineStore('profile', {
       })
 
       console.log('User saved:', this.user.email)
-      return true
-    },
-
-    async updateProfile() {
-      const db = getDatabase()
-      const safeEmail = this.user.email
-        .replace(/\./g, ',')
-        .replace(/@/g, '_')
-
-      await update(ref(db, `users/${safeEmail}`), {
-        name: this.user.name,
-        email: this.user.email,
-        password: this.user.password
-      })
-
-      console.log('User updated:', this.user.email)
       return true
     }
   }

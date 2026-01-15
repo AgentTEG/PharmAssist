@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useMedicineStore } from "../JS/handlemedicine";
+import { useHandleSchedule } from "../JS/handleschedule";
 import pendingIcon from '../assets/pending-icon.svg';
 import successIcon from '../assets/check-icon.svg';
 import missedIcon from '../assets/missed-icon.svg';
@@ -10,9 +11,10 @@ import pendingpillIcon from '../assets/coloredpill-icon.svg';
 import compartmentIcon from '../assets/compartment-icon.svg';
 import timeIcon from '../assets/time-icon.svg';
 import NewHome from './homeExtension.vue';
-import navBar from './navbar.vue';
 
-// Popup Modal form
+const scheduleStore = useHandleSchedule()
+let remainingMeds = ref(0);
+
 
 // Medicine Card Color Data
 const missedBackground = ref('#FFE6E6');
@@ -55,66 +57,96 @@ const greetings = ref([
   "Good evening",
 ]);
 
-// array of medicine data
-const medData = ref([
-  {
-    Name: "Metformin",
-    supply: "15 tablets",
-    timeDesc: timeTake.value[3],
-    scheduledTime: "12:00 PM",
-    dose: "500mg",
-    compartment: boxOrder.value[0],
-    status: successMessage.value[0],
-    statusIcon: missedIcon,
-    pillIcon: missedpillIcon,
-    background: missedBackground,
-    textColor: missedText,
-  },
-  {
-    Name: "Lisinopril",
-    supply: "19 tablets",
-    timeDesc: timeTake.value[0],
-    scheduledTime: "8:00 AM",
-    dose: "10mg",
-    compartment: boxOrder.value[1],
-    status: successMessage.value[1],
-    statusIcon: successIcon,
-    pillIcon: takenpillIcon,
-    background: successBackground,
-    textColor: successText,
-  },
-  {
-    Name: "Atorvastatin",
-    supply: "11 tablets",
-    timeDesc: timeTake.value[9],
-    scheduledTime: "8:00 PM",
-    dose: "20mg",
-    compartment: boxOrder.value[2],
-    status: successMessage.value[2],
-    statusIcon: pendingIcon,
-    pillIcon: pendingpillIcon,
-    background: pendingBackground,
-    textColor: pendingText,
-  },
-  {
-    Name: "Amoxicillin",
-    supply: "8 tablets",
-    timeDesc: timeTake.value[8],
-    scheduledTime: "10:00 PM",
-    dose: "10mg",
-    compartment: boxOrder.value[3],
-    status: successMessage.value[2],
-    statusIcon: pendingIcon,
-    pillIcon: pendingpillIcon,
-    background: pendingBackground,
-    textColor: pendingText,
+  // Reactive medData array
+  const medData = ref([]);
+  
+  // Helper functions
+  function schedtype(type){
+    if (type === "daily") return timeTake.value[10];
+    else if (type === "weekly") return timeTake.value[11];
+    else return "";
   }
-]);
+  
+  function currentmedstatus(status){
+    if (status === "missed") return { status: successMessage.value[0], background: missedBackground.value, textColor: missedText.value, statusIcon: missedIcon, pillIcon: missedpillIcon };
+    else if (status === "taken") return { status: successMessage.value[1], background: successBackground.value, textColor: successText.value, statusIcon: successIcon, pillIcon: takenpillIcon };
+    else if (status === "pending") return { status: successMessage.value[2], background: pendingBackground.value, textColor: pendingText.value, statusIcon: pendingIcon, pillIcon: pendingpillIcon };
+    else return { status: successMessage.value[3], background: missedBackground.value, textColor: missedText.value, statusIcon: missedIcon, pillIcon: missedpillIcon };
+  }
+  
+  // Build medData array from scheduleStore
+  function buildMedData() {
+    medData.value = [
+      {
+        Name: scheduleStore.box1medicine || "No medicine",
+        supply: (scheduleStore.box1dose || 0) + " tablets",
+        timeDesc: schedtype(scheduleStore.box1schedtype || "n/a"),
+        scheduledTime: scheduleStore.box1shed || "N/A",
+        dose: "500mg",
+        compartment: boxOrder.value[0],
+        status: currentmedstatus(scheduleStore.box1status || "n/a").status,
+        statusIcon: currentmedstatus(scheduleStore.box1status || "n/a").statusIcon,
+        pillIcon: currentmedstatus(scheduleStore.box1status || "n/a").pillIcon,
+        background: currentmedstatus(scheduleStore.box1status || "n/a").background,
+        textColor: currentmedstatus(scheduleStore.box1status || "n/a").textColor,
+      },
+      {
+        Name: scheduleStore.box2medicine || "No medicine",
+        supply: (scheduleStore.box2dose || 0) + " tablets",
+        timeDesc: schedtype(scheduleStore.box2schedtype || "n/a"),
+        scheduledTime: scheduleStore.box2shed || "N/A",
+        dose: "10mg",
+        compartment: boxOrder.value[1],
+        status: currentmedstatus(scheduleStore.box2status || "n/a").status,
+        statusIcon: currentmedstatus(scheduleStore.box2status || "n/a").statusIcon,
+        pillIcon: currentmedstatus(scheduleStore.box2status || "n/a").pillIcon,
+        background: currentmedstatus(scheduleStore.box2status || "n/a").background,
+        textColor: currentmedstatus(scheduleStore.box2status || "n/a").textColor,
+      },
+      {
+        Name: scheduleStore.box3medicine || "No medicine",
+        supply: (scheduleStore.box3dose || 0) + " tablets",
+        timeDesc: schedtype(scheduleStore.box3schedtype || "n/a"),
+        scheduledTime: scheduleStore.box3shed || "N/A",
+        dose: "20mg",
+        compartment: boxOrder.value[2],
+        status: currentmedstatus(scheduleStore.box3status || "n/a").status,
+        statusIcon: currentmedstatus(scheduleStore.box3status || "n/a").statusIcon,
+        pillIcon: currentmedstatus(scheduleStore.box3status || "n/a").pillIcon,
+        background: currentmedstatus(scheduleStore.box3status || "n/a").background,
+        textColor: currentmedstatus(scheduleStore.box3status || "n/a").textColor,
+      },
+      {
+        Name: scheduleStore.box4medicine || "No medicine",
+        supply: (scheduleStore.box4dose || 0) + " tablets",
+        timeDesc: schedtype(scheduleStore.box4schedtype || "n/a"),
+        scheduledTime: scheduleStore.box4shed || "N/A",
+        dose: "10mg",
+        compartment: boxOrder.value[3],
+        status: currentmedstatus(scheduleStore.box4status || "n/a").status,
+        statusIcon: currentmedstatus(scheduleStore.box4status || "n/a").statusIcon,
+        pillIcon: currentmedstatus(scheduleStore.box4status || "n/a").pillIcon,
+        background: currentmedstatus(scheduleStore.box4status || "n/a").background,
+        textColor: currentmedstatus(scheduleStore.box4status || "n/a").textColor,
+      }
+    ];
+    remainingMeds.value = scheduleStore.medremain;
+  }
+  
+  onMounted(async () => {
+    scheduleStore.medremain = 0
+    await scheduleStore.fetchBoxes()
+    buildMedData()
+  
+    setInterval(async () => {
+      scheduleStore.medremain = 0
+      await scheduleStore.fetchBoxes()
+      buildMedData()
+    }, 5000)
+  })
 </script>
 
 <template>
-  <navBar />
-
   <div class="overview-container">
     <div class="overview-content">
       <div class="overview-icon">
@@ -130,9 +162,9 @@ const medData = ref([
 
   <div class="schedule-container">
     <div class="schedule-heading">
-      <span class="schedule-title">Your Weekly's Schedule</span>
+      <span class="schedule-title">Your Daily Schedule</span>
       <span class="medprogress-container">
-        <span class="medication-progress"> 2 remaining </span>
+        <span class="medication-progress"> {{ remainingMeds }} remaining </span>
       </span>
     </div>
 
@@ -189,7 +221,6 @@ const medData = ref([
     </div>
   </div>
 <NewHome />
-  
 </template>
 
 <style scoped>
@@ -202,11 +233,7 @@ const medData = ref([
 
 
 /* overview */
-.overview-container {
-  margin-left: 10%;
-  margin-right: 10%;
-  margin-top: 1rem;
-}
+
 .overview-content {
   display: flex;
   align-items: center;
@@ -242,9 +269,7 @@ const medData = ref([
 
 /* schedule */
 .schedule-container {
-  margin-left: 10%;
-  margin-right: 10%;
-  margin-top: 2.5rem;
+  margin-top: 2rem;
 }
 .schedule-heading {
   display: flex;
@@ -357,6 +382,7 @@ const medData = ref([
   gap: 1rem;
   margin-top: 1.5rem;
   background-color: transparent;
+  padding-bottom: 0.5rem;
 }
 .time-box {
   display: flex;
@@ -393,9 +419,4 @@ const medData = ref([
   width: 28px;
   background-color: transparent;
 }
-
-/* Popup Modal styles */
-
 </style>
-
-

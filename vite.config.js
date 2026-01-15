@@ -5,6 +5,6 @@ import vueDevtools from 'vite-plugin-vue-devtools'
 const isProduction = process.env.NODE_ENV === 'production'
 
 export default defineConfig({
-  base: isProduction ? '/PharmAssist/' : '/', // this tells Vite where your app is hosted
+  base: isProduction ? '/PharmAssist/' : '/', // REQUIRED for GitHub Pages
   plugins: [vue(), vueDevtools()],
 })

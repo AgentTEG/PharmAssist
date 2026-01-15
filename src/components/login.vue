@@ -45,7 +45,7 @@ async function submitlogin() {
   logpass = await loginhandler.loginCredentials(email.value, password.value);
 
   if (logpass) {
-    router.push("/home");
+    router.push("/dashboard/home");
   }
 }
 </script>
